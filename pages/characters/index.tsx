@@ -6,14 +6,14 @@ import React, { useState } from "react";
 import { BiSearchAlt } from "react-icons/bi";
 import CharacterNotFound from "../../components/CharacterNotFound";
 import PaginationButtons from "../../components/PaginationButtons";
-import { Characters, Props } from "../../types/types";
+import { Character, Props } from "../../types/types";
 import { getPages, myLoader } from "../../utils/utils";
 
 export default function HomePage(props: Props) {
-  const [page, setPage] = useState<Characters[]>(props.result.slice(0, 20));
+  const [page, setPage] = useState<Character[]>(props.result.slice(0, 20));
   const [notFound, setNotFound] = useState(false);
   const [onSearch, setonSearch] = useState(false);
-  const Allpages: Characters[][] = [];
+  const Allpages: Character[][] = [];
   const router = useRouter();
 
   const submitHandler = (e: React.SyntheticEvent<HTMLFormElement>) => {
@@ -69,15 +69,11 @@ export default function HomePage(props: Props) {
                     className="relative text-base lg:text-lg font-semibold border-[1px] border-zinc-900 p-2 xl:p-3 shadow-md hover:shadow-lg hover:cursor-pointer transition-all duration-200"
                     key={index}
                     onClick={() => {
-                      router.push(
-                        `${router.pathname}/${character.name
-                          ?.toLowerCase()
-                          .replace(" ", "_")}`
-                      );
+                      router.push(`${router.pathname}/${character.id}`);
                     }}
                   >
                     <div className="flex flex-col">
-                      <div className="select-none">
+                      <div className="select-none" key={character.id}>
                         <Image
                           loader={() => myLoader({ src: character.image })}
                           src={character.image}

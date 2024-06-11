@@ -1,13 +1,13 @@
 import React, { SetStateAction, useState } from "react";
 import { IoMdArrowDropright, IoMdArrowDropleft } from "react-icons/io";
-import { Characters } from "../types/types";
+import { Character } from "../types/types";
 
 export default function PaginationButtons({
   Allpages,
   setPage,
 }: {
-  Allpages: Characters[][];
-  setPage: React.Dispatch<SetStateAction<Characters[]>>;
+  Allpages: Character[][];
+  setPage: React.Dispatch<SetStateAction<Character[]>>;
 }) {
   const [paginate, setPaginate] = useState(0);
 

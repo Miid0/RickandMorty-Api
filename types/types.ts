@@ -1,6 +1,6 @@
-export interface Characters {
-  id?: number;
-  name?: string;
+export interface Character {
+  id: number;
+  name: string;
   status?: string;
   gender?: string;
   species?: string;
@@ -21,5 +21,9 @@ export interface Episode {
 }
 
 export type Props = {
-  result: Characters[];
+  result: Character[];
+};
+
+export type EpisodesProps = {
+  result: Episode[];
 };

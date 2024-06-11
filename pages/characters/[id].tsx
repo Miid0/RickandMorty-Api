@@ -2,39 +2,30 @@ import Image from "next/image";
 import { useRouter } from "next/router";
 import React, { useState } from "react";
 import { useCharacters } from "../../context/characterContext";
-import { Characters } from "../../types/types";
+import { Character } from "../../types/types";
 import { myLoader } from "../../utils/utils";
 import { BsGenderFemale, BsGenderMale } from "react-icons/bs";
-import NotFound from "../404";
 import Head from "next/head";
 import { IoClose } from "react-icons/io5";
+import { GetServerSideProps, GetStaticProps } from "next";
 
-function Character() {
+function Character(result: { result: Character }) {
   const router = useRouter();
-  const characters = useCharacters();
-  const [state, setState] = useState<Characters | undefined>(() =>
-    characters.find(
-      (chara) =>
-        chara.name?.replace(" ", "_").toLowerCase() === router.query.name
-    )
-  );
-  if (state === undefined) return <NotFound />;
-
   return (
     <>
       <Head>
-        <title>RickAndMorty | {state.name}</title>
+        <title>RickAndMorty | {result.result.name}</title>
         <link rel="icon" type="image/png" sizes="any" href="/images/icon.png" />
       </Head>
       <div className="flex container min-h-screen justify-center items-center mx-auto">
         <div className="flex flex-col md:flex-row-reverse  border-[1px] border-zinc-900 p-2 shadow-lg gap-2">
           <div className="select-none">
             <Image
+              src={result.result.image}
               width={400}
               height={400}
-              src={state.image}
-              alt={state.name}
-              loader={() => myLoader({ src: state.image })}
+              alt={result.result.name}
+              loader={() => myLoader({ src: result.result.image })}
               layout="intrinsic"
               priority={true}
             />
@@ -47,14 +38,19 @@ function Character() {
               <IoClose size={30} />
             </button>
             <div className="">
-              <h1 className="text-2xl md:text-4xl font-bold">{state.name}</h1>
-              <h2 className="font-light md:text-lg">-{state.location?.name}</h2>
-              <h1 className="text-lg md:text-xl">-{state.species}</h1>
+              <h1 className="text-2xl md:text-4xl font-bold">
+                {result.result.name}
+              </h1>
+              <h2 className="font-light md:text-lg">
+                -{result.result.location?.name}
+              </h2>
+              <h1 className="text-lg md:text-xl">-{result.result.species}</h1>
               <h2 className="text-lg md:text-xl">
-                {state.origin?.name !== "unknown" && state.origin?.name}
+                {result.result.origin?.name !== "unknown" &&
+                  result.result.origin?.name}
               </h2>
             </div>
-            {state.gender?.toLowerCase() === "male" ? (
+            {result.result.gender?.toLowerCase() === "male" ? (
               <BsGenderMale size={30} />
             ) : (
               <BsGenderFemale size={30} />
@@ -65,5 +61,29 @@ function Character() {
     </>
   );
 }
+
+export const getStaticPaths = async () => {
+  const res = await fetch("https://rickandmortyapi.com/api/character");
+  const data = await res.json();
+  const paths = data.results.map((character: Character) => ({
+    params: {
+      id: character.id.toString(),
+    },
+  }));
+  console.log("paths", paths);
+  return { paths, fallback: false };
+};
+
+export const getStaticProps: GetServerSideProps = async (context) => {
+  const { id } = context.params;
+  const res = await fetch(`https://rickandmortyapi.com/api/character/${id}`);
+  const result = await res.json();
+
+  return {
+    props: {
+      result,
+    },
+  };
+};
 
 export default Character;

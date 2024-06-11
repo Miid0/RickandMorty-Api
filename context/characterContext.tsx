@@ -1,15 +1,15 @@
 import Image from "next/image";
 import { createContext, useContext, useEffect, useState } from "react";
-import { Characters, Props } from "../types/types";
+import { Character, Props } from "../types/types";
 
-const CharactersContext = createContext<Characters[]>([]);
+const CharactersContext = createContext<Character[]>([]);
 
 export const CharactersProvider = (props: any) => {
-  const [characters, setCharacters] = useState<Characters[]>([]);
+  const [characters, setCharacters] = useState<Character[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    let result: Characters[] = [];
+    let result: Character[] = [];
 
     for (let page = 1; page <= 11; page++) {
       fetch(`https://rickandmortyapi.com/api/character/?page=${page}`)

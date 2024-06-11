@@ -2,29 +2,18 @@ import Head from "next/head";
 import Image from "next/image";
 import React, { useEffect, useState } from "react";
 import { IoMdArrowDropright, IoMdArrowDropleft } from "react-icons/io";
-import { Episode } from "../types/types";
+import { Episode, EpisodesProps, Props } from "../types/types";
 
-export default function Episodes() {
-  const [episodes, setEpisodes] = useState<Episode[]>([]);
+export default function Episodes(props: EpisodesProps) {
+  const [page, setPage] = useState<Episode>();
   const [season, setSeason] = useState(1);
 
   useEffect(() => {
-    const allSeasons: Episode[] = [];
-
-    for (let i = 1; i <= 3; i++) {
-      fetch(`https://rickandmortyapi.com/api/episode/?page=${i}`)
-        .then((res) => res.json())
-        .then((data) => {
-          const ep = data.results.filter((elem: Episode) => {
-            return elem.episode?.includes(`S0${season}`);
-          });
-          allSeasons.push(...ep);
-
-          if (i === 3) setEpisodes(allSeasons);
-        });
-    }
-  }, [season]);
-
+    props.result.filter((ep) => {
+      if (ep.episode.includes(`S0${season}`)) setPage(ep);
+    });
+  }, [page]);
+  console.log(page, season);
   const nextSeason = () => {
     if (season === 5) return;
     setSeason(season + 1);
@@ -52,29 +41,27 @@ export default function Episodes() {
               priority={true}
             />
           </div>
-          <div className="flex items-center gap-2 lg:gap-4">
-            <button
-              className="disabled:cursor-not-allowed disabled:opacity-25"
-              onClick={() => prevSeason()}
-              disabled={season === 1 ? true : false}
-            >
-              <IoMdArrowDropleft size={40} />
-            </button>
-            <h1 className="text-4xl lg:text-7xl font-bold">
-              Season {`${season}`}
-            </h1>
-            <button
-              className="disabled:cursor-not-allowed disabled:opacity-25"
-              onClick={() => nextSeason()}
-              disabled={season === 5 ? true : false}
-            >
-              <IoMdArrowDropright size={40} />
-            </button>
+          <div className="flex gap-5 sm:gap-12 md:gap-16 text-lg sm:text-xl lg:text-2xl xl:text-3xl mt-5">
+            <div className="hover:font-semibold border-hidden hover:border-b-2 lg:border-b-4 border-zinc-900">
+              Season1
+            </div>
+            <div className="hover:font-semibold border-b-2 lg:border-b-4 hover:border-zinc-900">
+              Season2
+            </div>
+            <div className="hover:font-semibold border-b-2 lg:border-b-4 hover:border-zinc-900">
+              Season3
+            </div>
+            <div className="hover:font-semibold border-b-2 lg:border-b-4 hover:border-zinc-900">
+              Season4
+            </div>
+            <div className="hover:font-semibold border-b-2 lg:border-b-4 hover:border-zinc-900">
+              Season5
+            </div>
           </div>
         </div>
         <ul className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 xl:grid-cols-5 gap-4 lg:gap-6">
-          {episodes &&
-            episodes.map((episode) => (
+          {props &&
+            props.result.map((episode) => (
               <li key={episode.id}>
                 <div className="shadow-md hover:shadow-lg border-[1px] text-center border-zinc-900 w-56 h-28 sm:w-48 md:w-44 md:h-40 xl:h-40 2xl:w-56 2xl:h-52 flex items-center justify-center p-4 lg:px-4 lg:py-6 group hover:bg-zinc-900 hover:text-gray-50 transition-all ease-in-out duration-200">
                   <div>
@@ -96,3 +83,16 @@ export default function Episodes() {
     </>
   );
 }
+
+export const getStaticProps = async () => {
+  let res = await fetch(`https://rickandmortyapi.com/api/episode/`);
+  let data: { results: Episode[] } = await res.json();
+  let result = data.results.filter((ep) => {
+    return ep.episode.includes("S01");
+  });
+  return {
+    props: {
+      result,
+    },
+  };
+};
